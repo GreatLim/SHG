@@ -44,7 +44,7 @@ int main() {
         for (nr = 1; nr <= N - 2; nr++) {
             r = nr * dr;
             f = 0;
-            if (nx >= 600 * RATIOX && nx <= 610 * RATIOX) f = 3000;
+            if (nx >= 600 * RATIOX && nx <= 610 * RATIOX) f = 30;
             nE1[nr] = oE1[nr] - C1 * (E1[nr + 1] + E1[nr - 1] - 2 * E1[nr]);
             //nE2[nr] has a problem
             nE2[nr] = oE2[nr] - C2 * (E2[nr + 1] + E2[nr - 1] - 2 * E2[nr]) -
@@ -60,7 +60,7 @@ int main() {
             if (cc > 255) cc = 255;
             if (cc < 0) cc = 0;
             if (nr % 2 == 0 && (nx / 2) % RATIOX == 0)
-                image_set_pixel(image, nx / 2.0 / RATIOX, nr / 3.0 + N / 3, cc * 256);
+                image_set_pixel(image, nx / 2.0 / RATIOX, nr / 3.0 + N / 3, cc);
             cc = cabs(nE3[nr]) * 100 * bright;
             if (cc > 255) cc = 255;
             if (cc < 0) cc = 0;
@@ -82,9 +82,9 @@ int main() {
                 double complex)*N);
         memcpy(E1, nE1, sizeof(
                 double complex)*N);
-        memcpy(E2, nE1, sizeof(
+        memcpy(E2, nE2, sizeof(
                 double complex)*N);
-        memcpy(E3, nE1, sizeof(
+        memcpy(E3, nE3, sizeof(
                 double complex)*N);
 
     }
