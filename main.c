@@ -2,17 +2,22 @@
 #include <complex.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 #include "image.h"
 
 const static int N = 768;
 const static int RATIOX = 4;
 
 int main() {
+    clock_t start, finish;
+    double  duration;
+
+    start = clock();
+
     double complex E1[N] = {0}, E2[N] = {0}, E3[N] = {0},
             oE1[N] = {0}, oE2[N] = {0}, oE3[N] = {0},
             nE1[N] = {0}, nE2[N] = {0}, nE3[N] = {0};
     double complex C1, C2, C3;
-    double complex t;
     double k1, k2, k3, dk, dx = 1.0 / RATIOX, dr = 1, kk1 = 0.01;
     double f, x, r;
     double bright = 2, r1 = 5, r3 = 100;
@@ -46,7 +51,6 @@ int main() {
             f = 0;
             if (nx >= 600 * RATIOX && nx <= 610 * RATIOX) f = 30;
             nE1[nr] = oE1[nr] - C1 * (E1[nr + 1] + E1[nr - 1] - 2 * E1[nr]);
-            //nE2[nr] has a problem
             nE2[nr] = oE2[nr] - C2 * (E2[nr + 1] + E2[nr - 1] - 2 * E2[nr]) -
                       0.5 * I * dx * kk1 * f * E3[nr] * conj(E1[nr]) * cexp(-I * dk * x);
             nE3[nr] = oE3[nr] - C3 * (E3[nr + 1] + E3[nr - 1] - 2 * E3[nr]);
@@ -92,6 +96,12 @@ int main() {
     image_save(image, "pic.pgm");
 
     image_free(image);
+
+    finish = clock();
+
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+
+    printf("run in %f seconds\n", duration);
 
 
 //    Image *image_fun;
