@@ -5,7 +5,9 @@
 #include <time.h>
 #include "image.h"
 
-const static int N = 768;
+#define N 768
+
+//const static int N = 768;
 const static int RATIOX = 4;
 
 int main() {
