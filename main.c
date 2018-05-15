@@ -8,7 +8,7 @@
 #define RATIOX 1
 
 int main(int argc, char *argv[]) {
-    double start, finish;
+    double start, finish, speed;
     double duration;
 
     int test = 0;
@@ -23,11 +23,11 @@ int main(int argc, char *argv[]) {
     int nx, nr, cc, i;
 
 
-//    omp_set_num_threads(atoi(argv[1]));
+    omp_set_num_threads(atoi(argv[1]));
 
-    // 设置线程数量
-    int num_threads = 2;
-    omp_set_num_threads(num_threads);
+// 设置线程数量
+//    int num_threads = 2;
+//    omp_set_num_threads(num_threads);
 
 
     k1 = 2;
@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel
     {
 
+//并行执行for循环，有隐性的barrier
 #pragma omp for private(r)
         for (nr = 1; nr <= N - 1; nr += 1) {
             r = nr * dr;
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
             oE3[nr] = exp(-pow((r - 150 * dr) / r3, 2));
         }
 
-
+//并行执行for循环，有隐性的barrier
 #pragma omp for private(r)
         for (nr = 1; nr <= N - 2; nr += 1) {
             r = nr * dr;
@@ -64,15 +65,13 @@ int main(int argc, char *argv[]) {
         }
 
 
-
 //所有线程达到同步
 #pragma omp barrier
 
+//单线程执行
 #pragma omp single
         nx = 1;
 
-//        for (nx = 1; nx <= 2400 * RATIOX; nx++) {
-//            for (nx = 1; nx <= 1000; nx++)
         while(nx <= 2400 * RATIOX) {
 
 //单线程执行
@@ -93,20 +92,20 @@ int main(int argc, char *argv[]) {
                           0.5 * I * dx * kk1 * f * E3[nr] * conj(E1[nr]) * cexp(-I * dk * x);
                 nE3[nr] = oE3[nr] - C3 * (E3[nr + 1] + E3[nr - 1] - 2 * E3[nr]);
 
-            cc = cabs(nE1[nr]) * 200;
-            if (cc > 255) cc = 255;
-            if (cc < 0) cc = 0;
-            if (nr % 2 == 0 && (nx / 2) % RATIOX == 0) image_set_pixel(image, nx / 2.0 / RATIOX, nr / 3.0, cc);
-            cc = cabs(nE2[nr]) * 100 * bright;
-            if (cc > 255) cc = 255;
-            if (cc < 0) cc = 0;
-            if (nr % 2 == 0 && (nx / 2) % RATIOX == 0)
-                image_set_pixel(image, nx / 2.0 / RATIOX, nr / 3.0 + N / 3, cc);
-            cc = cabs(nE3[nr]) * 100 * bright;
-            if (cc > 255) cc = 255;
-            if (cc < 0) cc = 0;
-            if (nr % 2 == 0 && (nx / 2) % RATIOX == 0)
-                image_set_pixel(image, nx / 2.0 / RATIOX, nr / 3.0 + N / 3 * 2, cc * (256 + 1));
+//            cc = cabs(nE1[nr]) * 200;
+//            if (cc > 255) cc = 255;
+//            if (cc < 0) cc = 0;
+//            if (nr % 2 == 0 && (nx / 2) % RATIOX == 0) image_set_pixel(image, nx / 2.0 / RATIOX, nr / 3.0, cc);
+//            cc = cabs(nE2[nr]) * 100 * bright;
+//            if (cc > 255) cc = 255;
+//            if (cc < 0) cc = 0;
+//            if (nr % 2 == 0 && (nx / 2) % RATIOX == 0)
+//                image_set_pixel(image, nx / 2.0 / RATIOX, nr / 3.0 + N / 3, cc);
+//            cc = cabs(nE3[nr]) * 100 * bright;
+//            if (cc > 255) cc = 255;
+//            if (cc < 0) cc = 0;
+//            if (nr % 2 == 0 && (nx / 2) % RATIOX == 0)
+//                image_set_pixel(image, nx / 2.0 / RATIOX, nr / 3.0 + N / 3 * 2, cc * (256 + 1));
             }
 
 
@@ -122,8 +121,6 @@ int main(int argc, char *argv[]) {
             }
 
 //并行执行for循环，有隐性的barrier
-//#pragma omp single
-//            {
 #pragma omp for
             for (i = 0; i < N; i++) {
                     oE1[i] = E1[i];
@@ -133,6 +130,8 @@ int main(int argc, char *argv[]) {
                     E2[i] = nE2[i];
                     E3[i] = nE3[i];
                 }
+
+//单线程执行
 #pragma omp single
             nx++;
         }
@@ -147,15 +146,17 @@ int main(int argc, char *argv[]) {
     //实际运行时间
     duration = finish - start;
 
-    image_save(image, "pic.pgm");
+    speed = 2400 * RATIOX * 3 * N * 1.0e-009/ duration;
 
-    image_free(image);
+//    image_save(image, "pic.pgm");
+//
+//    image_free(image);
 
-    printf("Number of threads in environment: %d\n", omp_get_max_threads());
-    printf("Duration: %f seconds\n", duration);
-    printf("Speed: %f GDots/s\n", 2400 * RATIOX * 3 * N * 1.0e-009/ duration);
+//    printf("Number of threads in environment: %d\n", omp_get_max_threads());
+//    printf("Duration: %f seconds\n", duration);
+//    printf("Speed: %f GDots/s\n", speed);
 
-
+    printf("%d %f %f\n", omp_get_max_threads(), duration, speed);
 
     return 0;
 
