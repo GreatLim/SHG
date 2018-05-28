@@ -16,8 +16,8 @@ typedef struct {
     unsigned char *data;
 } Image;
 
-static Image * image_new(size_t width,
-          size_t height) {
+static Image *image_new(size_t width,
+                        size_t height) {
     Image *image;
 
     image = malloc(sizeof *image);
@@ -34,7 +34,7 @@ static void image_free(Image *image) {
 }
 
 static void image_fill(Image *image,
-           unsigned char value) {
+                       unsigned char value) {
     memset (image->data, value, image->width * image->height);
 }
 
@@ -54,9 +54,9 @@ static void image_set_pixel(Image *image,
 }
 
 static void image_set_pixel_fun(Image *image,
-                ssize_t x,
-                ssize_t y,
-                unsigned char value) {
+                                ssize_t x,
+                                ssize_t y,
+                                unsigned char value) {
     size_t tx, ty;
     unsigned char *p;
 
@@ -69,7 +69,7 @@ static void image_set_pixel_fun(Image *image,
 }
 
 static void image_save(const Image *image,
-           const char *filename) {
+                       const char *filename) {
     FILE *out;
 
     out = fopen(filename, "wb");
@@ -101,7 +101,8 @@ static void draw_Taijitu(Image *image, int radius, int value) {
                 image_set_pixel_fun(image, x, y, value);
 
     for (y = -radius; y < 0; y++)
-        for (x = -(int) sqrt((double) (-radius * y - y * y)); x < 0; x++)
+        for (x = -(int) sqrt((double) (-radius * y - y * y));
+             x < 0; x++)
             image_set_pixel_fun(image, x, y, value);
 
 
@@ -113,7 +114,8 @@ static void draw_Taijitu(Image *image, int radius, int value) {
     }
 
     for (y = 2 * radius / 6; y < 4 * radius / 6; y++) {
-        rlimit = (int) sqrt((double) (radius * y - y * y - 2 * radius_2 / 9));
+        rlimit = (int) sqrt((double) (radius * y -
+                                      y * y - 2 * radius_2 / 9));
         llimit = -rlimit;
 
         for (x = llimit; x < rlimit; x++)
